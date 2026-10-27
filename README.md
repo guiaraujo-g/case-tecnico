@@ -1,6 +1,4 @@
 # Case Técnico - Automação de Processamento de Pedidos com API
-> Esse case será usado para avaliar os candidatos da posição: https://tech-career.gupy.io/jobs/9694371
-
 Bem-vindo(a) ao nosso case técnico! O objetivo é avaliar suas habilidades em automação de fluxos, manipulação de dados e consumo de APIs RESTful.
 
 O ambiente de desenvolvimento é simplificado e baseado em Docker, permitindo que você foque totalmente na lógica da integração.
