@@ -21,6 +21,32 @@ services:
       - ./database:/data
     # Garante que o container tenha permissão para escrever nos volumes.
     user: node
+    depends_on:
+      - api
+
+  # API do case. Substitui o my-json-server (fora do ar), servindo o db.json
+  # local como REST: /users, /orders, /processed e /logs.
+  api:
+    image: node:22-alpine
+    container_name: case_api
+    restart: unless-stopped
+    working_dir: /tmp/api
+    # O json-server roda sobre uma COPIA do db.json em ./database, para que as
+    # escritas em /processed nao alterem o db.json versionado no repositorio.
+    # O json-server e instalado em /tmp/api para nao criar node_modules no projeto.
+    # A versao beta e necessaria: na 0.17.x o POST em /processed falha, porque
+    # os objetos de 'processed' nao tem o campo 'id'.
+    command: >-
+      sh -c "npm i json-server@1.0.0-beta.15 --silent;
+      [ -f /data/db.json ] || cp /seed/db.json /data/db.json;
+      exec npx json-server --watch /data/db.json --host 0.0.0.0 --port 3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      # Diretorio de dados gerados (db.json de trabalho e logistics.sqlite do n8n).
+      - ./database:/data
+      # db.json original, apenas leitura, usado como seed na primeira execucao.
+      - ./db.json:/seed/db.json:ro
 
 volumes:
   n8n_data:

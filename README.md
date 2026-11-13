@@ -41,7 +41,7 @@ Seu workflow no N8N deve seguir os seguintes passos:
 
 2.  **Validação:** O fluxo deve continuar apenas se o `status` for `"paid"`.
 
-3.  **Enriquecimento de Dados:** Se a validação for positiva, o fluxo deve usar o `userId` para buscar os dados completos do usuário através de uma requisição `GET` para a API: `https://my-json-server.typicode.com/guiaraujo-g/case-tecnico-position-9694371/users/{userId}`.
+3.  **Enriquecimento de Dados:** Se a validação for positiva, o fluxo deve usar o `userId` para buscar os dados completos do usuário através de uma requisição `GET` para a API: `http://api:3000/users/{userId}` (do host: `http://localhost:3000/users/{userId}`).
 
 4.  **Transformação:** Com os dados do pedido e do cliente em mãos, o fluxo deve montar um novo objeto JSON com a seguinte estrutura final:
     ```json
@@ -55,15 +55,35 @@ Seu workflow no N8N deve seguir os seguintes passos:
     ```
     *Observação: O valor de `processed_at` deve ser a data e hora do momento do processamento, no formato ISO 8601.*
 
-5.  **Gravação dos Dados:** O objeto JSON transformado deve ser enviado via `POST` para a seguinte API de destino:
-    `https://my-json-server.typicode.com/guiaraujo-g/case-tecnico-position-9694371/processed`
+5.  **Gravação dos Dados:** O objeto JSON transformado deve ser enviado via `POST` para a seguinte API de destino: `http://api:3000/processed` (do host: `http://localhost:3000/processed`)
 
 ## Como Testar e Verificar o Resultado
 
 1.  **Para disparar o fluxo:** Após importar e ativar seu workflow, use uma ferramenta como `curl` ou Postman para enviar o payload de teste para a URL do seu webhook.
 
-2.  **Para verificar se os dados foram salvos:** Acesse a URL da API de destino em seu navegador. Os registros que você enviou estarão listados lá:
-    [https://my-json-server.typicode.com/guiaraujo-g/case-tecnico-position-9694371/processed](https://my-json-server.typicode.com/guiaraujo-g/case-tecnico-position-9694371/processed)
+2.  **Para verificar se os dados foram salvos:** Acesse a API de destino em seu navegador. Os registros que você enviou estarão listados lá:
+    [http://localhost:3000/processed](http://localhost:3000/processed)
+
+## API Local (my-json-server indisponível)
+
+A API pública `my-json-server.typicode.com` está fora do ar e, além disso, deixou de servir este case: a plataforma só lê repositórios **públicos** e com o nome exato da URL, e o repositório `guiaraujo-g/case-tecnico` está **privado** e foi renomeado.
+
+Por isso o `docker-compose.yml` sobe um serviço `api` que serve o mesmo `db.json` localmente, com os mesmos recursos (`/users`, `/orders`, `/processed`, `/logs`) e com leitura e escrita:
+
+| Item | my-json-server (original) | API local (atual) |
+|---|---|---|
+| Buscar cliente | `GET .../users/{userId}` | `GET http://localhost:3000/users/{userId}` |
+| Salvar processado | `POST .../processed` | `POST http://localhost:3000/processed` |
+| Consultar | `GET .../processed` | `GET http://localhost:3000/processed` |
+| De outro container | — | `http://api:3000/...` |
+
+**Do n8n (dentro do Docker), use `http://api:3000`** em vez de `localhost`. Fora do Docker (curl, Postman, navegador), use `http://localhost:3000`.
+
+Os dados gravados vão para `./database/db.json`, e não para o `db.json` versionado na raiz — assim o arquivo original fica intacto como seed. Para zerar o estado, apague `database/db.json` e reinicie a API:
+
+```bash
+rm -f database/db.json && docker compose restart api
+```
 
 ## O Que Entregar
 

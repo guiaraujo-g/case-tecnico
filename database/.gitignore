@@ -1,0 +1,4 @@
+# Dados gerados em tempo de execucao (db.json de trabalho, logistics.sqlite do n8n).
+# O db.json original fica na raiz e e usado como seed pela API.
+*
+!.gitignore
