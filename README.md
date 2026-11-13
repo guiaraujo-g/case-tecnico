@@ -10,18 +10,37 @@ Sua tarefa é criar um fluxo de trabalho automatizado que é acionado quando um 
 ## Pré-requisitos
 
 - Uma instância do n8n (a interna da empresa ou local via Docker)
+- Nenhuma instalação adicional é necessária para acessar a API do case
 
-Docker é **opcional**: só é necessário se você quiser rodar a API do case na sua máquina em vez de usar a API pública.
+> [!IMPORTANT]
+> **Não tem Docker instalado? Use a API online.**
+> A API do case já está publicada em **https://case-tecnico-api.onrender.com** e não exige nenhuma instalação local.
+> Docker é **opcional** e só é necessário se você quiser rodar a API na sua própria máquina — veja a seção [Alternativa: rodar a API localmente](#alternativa-rodar-a-api-localmente).
 
 ## Como Iniciar o Ambiente
 
-A API do case já está publicada e não precisa de nenhuma instalação:
+**Caminho principal (sem Docker):** use a API pública, que já está no ar:
 
 ```
 https://case-tecnico-api.onrender.com
 ```
 
-Basta configurar seu workflow no n8n apontando para essas URLs. Se preferir não depender da API pública, veja a seção **Alternativa: rodar a API localmente**.
+Basta configurar seu workflow no n8n apontando para essa base. As rotas disponíveis estão detalhadas na seção [API do Case](#api-do-case).
+
+Exemplos rápidos:
+
+```bash
+# Passo 3: buscar o cliente
+curl https://case-tecnico-api.onrender.com/users/5
+
+# Passo 5: salvar o pedido processado
+curl -X POST https://case-tecnico-api.onrender.com/processed \
+  -H "Content-Type: application/json" \
+  -d '{"order_id":101,"customer_name":"Chelsey Dietrich","customer_email":"Lucio_Hettinger@annie.ca","delivery_address":"Skiles Walks, Suite 351, Roscoeview, 33263","processed_at":"2025-09-09T12:29:00.000Z"}'
+
+# Verificação: listar o que foi salvo
+curl https://case-tecnico-api.onrender.com/processed
+```
 
 ## Detalhes do Fluxo de Trabalho
 
@@ -63,17 +82,22 @@ Seu workflow no N8N deve seguir os seguintes passos:
 
 ## API do Case
 
-A API está publicada em `https://case-tecnico-api.onrender.com` e é servida por um [JSON Server](https://github.com/typicode/json-server) que lê o [`db.json`](db.json) deste repositório:
+A API está publicada em **https://case-tecnico-api.onrender.com** e é servida por um [JSON Server](https://github.com/typicode/json-server) que lê o [`db.json`](db.json) deste repositório.
 
-| Operação | Endpoint |
-|---|---|
-| Buscar cliente | `GET https://case-tecnico-api.onrender.com/users/{userId}` |
-| Salvar processado | `POST https://case-tecnico-api.onrender.com/processed` |
-| Consultar processados | `GET https://case-tecnico-api.onrender.com/processed` |
+### Rotas disponíveis
+
+| Operação | Método | Endpoint |
+|---|---|---|
+| Buscar cliente | `GET` | `https://case-tecnico-api.onrender.com/users/{userId}` |
+| Listar clientes | `GET` | `https://case-tecnico-api.onrender.com/users` |
+| Salvar processado | `POST` | `https://case-tecnico-api.onrender.com/processed` |
+| Consultar processados | `GET` | `https://case-tecnico-api.onrender.com/processed` |
+| Listar pedidos | `GET` | `https://case-tecnico-api.onrender.com/orders` |
+| Listar logs | `GET` | `https://case-tecnico-api.onrender.com/logs` |
 
 ### Observações importantes
 
-- **Primeira chamada pode demorar cerca de 1 minuto.** A API roda no plano gratuito do Render, que suspende o serviço após 15 minutos sem tráfego. A requisição seguinte "acorda" o serviço. Se a primeira chamada der timeout, aguarde e tente de novo.
+- **Primeira chamada pode demorar cerca de 1 minuto.** A API roda no plano gratuito do Render, que suspende o serviço após 15 minutos sem tráfego. A requisição seguinte "acorda" o serviço. Se a primeira chamada der timeout, aguarde e tente novamente.
 - **Os dados enviados não são permanentes.** O plano gratuito usa disco efêmero: registros gravados via `POST` são perdidos quando o serviço reinicia ou é suspenso. O objetivo do passo 5 é validar que a chamada foi feita corretamente, não garantir armazenamento.
 - A API é pública e sem autenticação, como no enunciado original.
 
