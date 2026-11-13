@@ -109,13 +109,16 @@ Se preferir não depender da API pública (ou se ela estiver indisponível), rod
 docker compose up -d api
 ```
 
-Isso serve o mesmo `db.json` em `http://localhost:3000`:
+Isso serve o mesmo `db.json` em `http://localhost:3000`, com as mesmas rotas da API pública:
 
-| Operação | Endpoint local |
-|---|---|
-| Buscar cliente | `GET http://localhost:3000/users/{userId}` |
-| Salvar processado | `POST http://localhost:3000/processed` |
-| Consultar processados | `GET http://localhost:3000/processed` |
+| Operação | Método | Endpoint local |
+|---|---|---|
+| Buscar cliente | `GET` | `http://localhost:3000/users/{userId}` |
+| Listar clientes | `GET` | `http://localhost:3000/users` |
+| Salvar processado | `POST` | `http://localhost:3000/processed` |
+| Consultar processados | `GET` | `http://localhost:3000/processed` |
+| Listar pedidos | `GET` | `http://localhost:3000/orders` |
+| Listar logs | `GET` | `http://localhost:3000/logs` |
 
 **Do n8n rodando em container, use `http://api:3000`** em vez de `localhost`. Fora do Docker (curl, Postman, navegador), use `http://localhost:3000`.
 
