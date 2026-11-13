@@ -1,0 +1,11 @@
+.git
+.gitignore
+.cursor
+database
+node_modules
+README.md
+docker-compose.yml
+workflow.json
+Dockerfile
+.dockerignore
+render.yaml

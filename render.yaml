@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: case-tecnico-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    # Valida que o db.json realmente carregou, e nao apenas que o processo subiu.
+    healthCheckPath: /users/5
+    envVars:
+      - key: PORT
+        value: 10000
