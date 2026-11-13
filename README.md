@@ -64,22 +64,20 @@ Seu workflow no N8N deve seguir os seguintes passos:
 2.  **Para verificar se os dados foram salvos:** Acesse a API de destino em seu navegador. Os registros que você enviou estarão listados lá:
     [http://localhost:3000/processed](http://localhost:3000/processed)
 
-## API Local (my-json-server indisponível)
+## API do Case
 
-A API pública `my-json-server.typicode.com` está fora do ar e, além disso, deixou de servir este case: a plataforma só lê repositórios **públicos** e com o nome exato da URL, e o repositório `guiaraujo-g/case-tecnico` está **privado** e foi renomeado.
+O `docker-compose.yml` sobe um serviço `api` que serve o `db.json` localmente, com os recursos `users`, `orders`, `processed` e `logs`, com leitura e escrita:
 
-Por isso o `docker-compose.yml` sobe um serviço `api` que serve o mesmo `db.json` localmente, com os mesmos recursos (`/users`, `/orders`, `/processed`, `/logs`) e com leitura e escrita:
-
-| Item | my-json-server (original) | API local (atual) |
-|---|---|---|
-| Buscar cliente | `GET .../users/{userId}` | `GET http://localhost:3000/users/{userId}` |
-| Salvar processado | `POST .../processed` | `POST http://localhost:3000/processed` |
-| Consultar | `GET .../processed` | `GET http://localhost:3000/processed` |
-| De outro container | — | `http://api:3000/...` |
+| Operação | Endpoint |
+|---|---|
+| Buscar cliente | `GET http://localhost:3000/users/{userId}` |
+| Salvar processado | `POST http://localhost:3000/processed` |
+| Consultar processados | `GET http://localhost:3000/processed` |
+| De outro container | `http://api:3000/...` |
 
 **Do n8n (dentro do Docker), use `http://api:3000`** em vez de `localhost`. Fora do Docker (curl, Postman, navegador), use `http://localhost:3000`.
 
-Os dados gravados vão para `./database/db.json`, e não para o `db.json` versionado na raiz — assim o arquivo original fica intacto como seed. Para zerar o estado, apague `database/db.json` e reinicie a API:
+Os dados gravados vão para `./database/db.json`, e não para o `db.json` da raiz — assim o arquivo original fica intacto como seed. Para zerar o estado, apague `database/db.json` e reinicie a API:
 
 ```bash
 rm -f database/db.json && docker compose restart api

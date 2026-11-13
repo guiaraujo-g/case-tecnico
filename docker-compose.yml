@@ -24,8 +24,8 @@ services:
     depends_on:
       - api
 
-  # API do case. Substitui o my-json-server (fora do ar), servindo o db.json
-  # local como REST: /users, /orders, /processed e /logs.
+  # API do case: serve o db.json local como REST (/users, /orders,
+  # /processed e /logs), com leitura e escrita.
   api:
     image: node:22-alpine
     container_name: case_api
